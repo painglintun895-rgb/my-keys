@@ -9,4 +9,4 @@ u0_a275 | kyawHTun | 2026-05-12
 u0_a283 | phoe pyae | 2026-05-29
 u0_a36 | htet naing | 2036-01-01
 u0_a417 | ko toe | 2026-05-28
-u0_a307 | O Zin | 2086-01-1
+u0_a307 | O Zin | 2036-01-1
